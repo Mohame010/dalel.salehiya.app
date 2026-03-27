@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "820731255927",
+    "project_id": "dalel-el-salehiya",
+    "storage_bucket": "dalel-el-salehiya.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820731255927:android:57079b86cedd2661a2fa72",
+        "android_client_info": {
+          "package_name": "com.dalel.salehiya"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCu6KsqOOB6yOPC3s4lofq94kT_rJDEVb8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

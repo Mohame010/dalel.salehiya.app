@@ -1,0 +1,63 @@
+name: sa3dawy_app
+description: A professional Flutter app (Dashboard + User App)
+publish_to: "none"
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+
+  # 🌐 API
+  http: ^1.2.1
+
+  # 💾 Local Storage
+  shared_preferences: ^2.2.3
+
+  # 🧠 State Management
+  provider: ^6.1.2
+
+  # 🖼 Images (مهم جدًا)
+  cached_network_image: ^3.3.1
+
+  # 🎞 Carousel (Ads)
+  carousel_slider: ^5.1.2
+
+  # 🔗 فتح واتساب / روابط
+  url_launcher: ^6.3.0
+
+  # ✨ Animations
+  flutter_animate: ^4.5.0
+  onesignal_flutter: ^5.4.6
+  rename: ^3.1.0
+  firebase_core_dart: ^1.0.1
+  firebase_auth: ^6.3.0
+  cloud_firestore: ^6.2.0
+  firebase_storage: ^13.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  # 🖼 Assets
+  assets:
+    - assets/images/
+
+  # 🔤 Fonts (اختياري)
+  fonts:
+    - family: Cairo
+      fonts:
+        - asset: assets/fonts/Cairo-Regular.ttf
+        - asset: assets/fonts/Cairo-Bold.ttf
+          weight: 700
