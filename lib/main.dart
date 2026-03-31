@@ -63,10 +63,6 @@ void main() async {
     else if (openType == "screen") {
 
       navigatorKey.currentState?.pushNamed('/home');
-
-      /// بعدين نطورها:
-      /// /place-details
-      /// /transport
     }
   });
 
@@ -79,7 +75,12 @@ class MyApp extends StatelessWidget {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()),
+
+        /// ✅ تعديل هنا (حل مشكلة Guest)
+        ChangeNotifierProvider(
+          create: (_) => AuthProvider()..loadUser(), // 🔥 مهم جدًا
+        ),
+
         ChangeNotifierProvider(create: (_) => HomeProvider()),
         ChangeNotifierProvider(create: (_) => AppThemeProvider()),
       ],

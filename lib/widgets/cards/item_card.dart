@@ -8,59 +8,64 @@ class ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Container(
-      margin: EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            blurRadius: 6,
-            color: Colors.black12,
-          )
-        ],
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.dividerColor),
       ),
+
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// 🖼 Image
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-            child: Image.network(
-              item.image,
-              height: 120,
-              width: double.infinity,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
-                height: 120,
-                color: Colors.grey[300],
-                child: Icon(Icons.image),
+          /// 🖼 IMAGE
+          AspectRatio(
+            aspectRatio: 1.2, // 🔥 أهم حاجة تمنع الفراغ
+            child: ClipRRect(
+              borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.network(
+                item.image,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  color: theme.cardColor,
+                  child: Icon(Icons.image, size: 30),
+                ),
               ),
             ),
           ),
 
-          /// 📄 Info
+          /// 📄 INFO
           Padding(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.symmetric(
+                horizontal: 8, vertical: 6),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
+                /// NAME
                 Text(
                   item.name,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
 
-                SizedBox(height: 6),
+                SizedBox(height: 4),
 
+                /// PRICE
                 Text(
-                  "${item.price} جنيه",
+                  "${item.price} ج",
                   style: TextStyle(
-                    color: Colors.green,
+                    fontSize: 13,
                     fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.primary,
                   ),
                 ),
               ],

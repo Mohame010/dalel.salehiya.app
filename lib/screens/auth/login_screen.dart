@@ -18,20 +18,23 @@ class _LoginScreenState extends State<LoginScreen> {
 
   final formKey = GlobalKey<FormState>();
 
+  /// 🔐 LOGIN FUNCTION
   void login() async {
     if (!formKey.currentState!.validate()) return;
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
 
     bool success = await auth.login(
-      phoneController.text,
-      passwordController.text,
+      phoneController.text.trim(),
+      passwordController.text.trim(),
     );
 
     if (success) {
+      Helpers.showSnackBar(context, "تم تسجيل الدخول ✅");
+
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else {
-      Helpers.showSnackBar(context, "Login failed");
+      Helpers.showSnackBar(context, "فشل تسجيل الدخول ❌");
     }
   }
 
@@ -150,8 +153,13 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                         child: auth.loading
-                            ? CircularProgressIndicator(
-                                color: Colors.white,
+                            ? SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
                             : Text(
                                 "تسجيل الدخول",

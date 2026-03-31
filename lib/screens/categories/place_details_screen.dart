@@ -51,8 +51,10 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     final place =
         ModalRoute.of(context)!.settings.arguments as PlaceModel;
 
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       /// 🔘 Bottom Buttons
       bottomNavigationBar: Container(
@@ -69,7 +71,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 icon: Icon(Icons.phone),
                 label: Text("اتصل"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF0D9488),
+                  backgroundColor: theme.colorScheme.primary,
                 ),
               ),
             ),
@@ -104,15 +106,17 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 SliverAppBar(
                   expandedHeight: 250,
                   pinned: true,
-                  backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-                  iconTheme: IconThemeData(color: Colors.black),
+                  backgroundColor: theme.scaffoldBackgroundColor,
+                  iconTheme: IconThemeData(
+                    color: theme.iconTheme.color,
+                  ),
 
                   flexibleSpace: FlexibleSpaceBar(
                     background: Image.network(
                       place.image,
                       fit: BoxFit.cover,
                       errorBuilder: (_, __, ___) => Container(
-                        color: Colors.grey[300],
+                        color: theme.cardColor,
                         child: Icon(Icons.image, size: 50),
                       ),
                     ),
@@ -139,15 +143,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         SizedBox(height: 10),
 
                         /// 📍 Address Card
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        _buildCard(
+                          context,
                           child: Row(
                             children: [
-                              Icon(Icons.location_on, color: Colors.red),
+                              Icon(Icons.location_on,
+                                  color: theme.colorScheme.error),
                               SizedBox(width: 8),
                               Expanded(child: Text(place.address)),
                             ],
@@ -157,12 +158,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         SizedBox(height: 15),
 
                         /// 🕒 Time Card
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        _buildCard(
+                          context,
                           child: Column(
                             children: [
 
@@ -187,18 +184,16 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                           ),
                         ),
 
-                        SizedBox(height: 20),
+                        SizedBox(height: 15),
 
                         /// 📞 Phone Card
-                        Container(
-                          padding: EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.teal.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+                        _buildCard(
+                          context,
+                          color: theme.colorScheme.primary.withOpacity(0.1),
                           child: Row(
                             children: [
-                              Icon(Icons.phone, color: Colors.teal),
+                              Icon(Icons.phone,
+                                  color: theme.colorScheme.primary),
                               SizedBox(width: 8),
                               Text(place.phone),
                             ],
@@ -219,23 +214,43 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                         SizedBox(height: 10),
 
                         GridView.builder(
-  shrinkWrap: true,
-  physics: NeverScrollableScrollPhysics(),
-  itemCount: items.length,
-  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-    crossAxisCount: 2,
-    childAspectRatio: 0.75,
-  ),
-  itemBuilder: (context, index) {
-    return ItemCard(item: items[index]);
-  },
-),
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: items.length,
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            childAspectRatio: 0.75,
+                          ),
+                          itemBuilder: (context, index) {
+                            return ItemCard(item: items[index]);
+                          },
+                        ),
                       ],
                     ),
                   ),
                 )
               ],
             ),
+    );
+  }
+
+  /// 💎 Reusable Card (Dark Mode Safe)
+  Widget _buildCard(BuildContext context,
+      {required Widget child, Color? color}) {
+
+    final theme = Theme.of(context);
+
+    return Container(
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: color ?? theme.cardColor,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.dividerColor,
+        ),
+      ),
+      child: child,
     );
   }
 }

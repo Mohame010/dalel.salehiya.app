@@ -17,7 +17,8 @@ class _TransportScreenState extends State<TransportScreen>
 
   late TabController _tabController;
 
-  final types = ["توكتوك", "ميكروباص", "أتوبيس"];
+  // ✅ تم التعديل (قطار بدل أتوبيس)
+  final types = ["توكتوك", "ميكروباص", "قطار"];
 
   @override
   void initState() {
@@ -30,7 +31,7 @@ class _TransportScreenState extends State<TransportScreen>
 
   Future<void> loadRoutes() async {
     try {
-      final res = await ApiService.get('/routes'); // 🔥 بدون /
+      final res = await ApiService.get('/routes');
 
       routes = (res as List)
           .map((e) => TransportModel.fromJson(e))
@@ -64,7 +65,7 @@ class _TransportScreenState extends State<TransportScreen>
                     ),
                   ),
                   Spacer(),
-                  Icon(Icons.directions_bus),
+                  Icon(Icons.train), // ✅ قطار بدل أتوبيس
                 ],
               ),
             ),
@@ -98,15 +99,20 @@ class _TransportScreenState extends State<TransportScreen>
                       controller: _tabController,
                       children: types.map((type) {
 
-                        final filtered =
-                            routes.where((r) => r.type == type).toList();
+                        // ✅ فلترة محسنة
+                        final filtered = routes.where((r) {
+                          if (type == "قطار") {
+                            return r.type == "قطار" || r.type == "أتوبيس";
+                          }
+                          return r.type.trim() == type.trim();
+                        }).toList();
 
                         if (filtered.isEmpty) {
                           return Center(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Icon(Icons.directions_bus,
+                                Icon(Icons.train,
                                     size: 50, color: Colors.grey),
                                 SizedBox(height: 10),
                                 Text("لا يوجد بيانات"),

@@ -11,7 +11,7 @@ class UserModel {
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'],
+      id: json['id'] ?? 0, // ✅ أهم تعديل
       name: json['name'] ?? '',
       phone: json['phone'] ?? '',
     );

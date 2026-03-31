@@ -5,6 +5,7 @@ class TransportModel {
   final String to;
   final double price;
   final int categoryId;
+  final String? time; // ✅ جديد
 
   TransportModel({
     required this.id,
@@ -13,6 +14,7 @@ class TransportModel {
     required this.to,
     required this.price,
     required this.categoryId,
+    this.time, // ✅ جديد
   });
 
   factory TransportModel.fromJson(Map<String, dynamic> json) {
@@ -23,6 +25,7 @@ class TransportModel {
       to: json['to_location'] ?? '',
       price: double.tryParse(json['price'].toString()) ?? 0,
       categoryId: json['category_id'] ?? 0,
+      time: json['time'], // ✅ جديد
     );
   }
 }
