@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/place_model.dart';
 import '../../routes/app_routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class PlaceCard extends StatefulWidget {
   final PlaceModel place;
@@ -63,17 +64,30 @@ class _PlaceCardState extends State<PlaceCard> {
                 child: Stack(
                   children: [
 
-                    Image.network(
-                      place.image,
-                      height: 160,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        height: 160,
-                        color: Colors.grey[300],
-                        child: Icon(Icons.image, size: 40),
-                      ),
+              CachedNetworkImage(
+                imageUrl: place.image,
+                 height: 160,
+                 width: double.infinity,
+                 fit: BoxFit.cover,
+
+                   /// ⚡ أثناء التحميل
+                  placeholder: (context, url) => Container(
+                  height: 160,
+                  color: Colors.grey[200],
+                  child: Center(child: CircularProgressIndicator()),
                     ),
+
+                   /// ❌ لو الصورة بايظة
+                 errorWidget: (context, url, error) => Container(
+                  height: 160,
+                  color: Colors.grey[300],
+                  child: Icon(Icons.image, size: 40),
+                  ),
+
+                    /// 🚀 تحسين الأداء
+                    memCacheWidth: 400,
+                    memCacheHeight: 300,
+                     ),
 
                     /// 🌑 Overlay خفيف
                     Positioned.fill(

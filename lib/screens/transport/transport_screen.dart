@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../models/transport_model.dart';
 import '../../services/api_service.dart';
@@ -17,7 +18,6 @@ class _TransportScreenState extends State<TransportScreen>
 
   late TabController _tabController;
 
-  // ✅ تم التعديل (قطار بدل أتوبيس)
   final types = ["توكتوك", "ميكروباص", "قطار"];
 
   @override
@@ -30,14 +30,32 @@ class _TransportScreenState extends State<TransportScreen>
   }
 
   Future<void> loadRoutes() async {
+    final box = Hive.box('appData');
+
     try {
+      /// 🌐 API
       final res = await ApiService.get('/routes');
 
       routes = (res as List)
           .map((e) => TransportModel.fromJson(e))
           .toList();
+
+      /// 💾 Save
+      await box.put('routes', res);
+
+      print("✅ ROUTES FROM API");
+
     } catch (e) {
-      print(e);
+
+      print("⚠️ LOAD ROUTES FROM CACHE");
+
+      final cached = box.get('routes') ?? [];
+
+      routes = (cached as List)
+          .map((e) => TransportModel.fromJson(
+                Map<String, dynamic>.from(e),
+              ))
+          .toList();
     }
 
     setState(() => loading = false);
@@ -65,7 +83,7 @@ class _TransportScreenState extends State<TransportScreen>
                     ),
                   ),
                   Spacer(),
-                  Icon(Icons.train), // ✅ قطار بدل أتوبيس
+                  Icon(Icons.train),
                 ],
               ),
             ),
@@ -99,7 +117,6 @@ class _TransportScreenState extends State<TransportScreen>
                       controller: _tabController,
                       children: types.map((type) {
 
-                        // ✅ فلترة محسنة
                         final filtered = routes.where((r) {
                           if (type == "قطار") {
                             return r.type == "قطار" || r.type == "أتوبيس";

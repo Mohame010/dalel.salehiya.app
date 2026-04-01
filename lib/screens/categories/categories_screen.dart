@@ -26,60 +26,66 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     final home = Provider.of<HomeProvider>(context);
 
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body: Column(
+        children: [
 
-      body: SafeArea(
-        child: home.loading
-            ? Center(child: CircularProgressIndicator())
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-
-                  /// 🔥 Header
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "الأقسام",
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          "اختر القسم المناسب",
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  /// 🧩 Grid
-                  Expanded(
-                    child: GridView.builder(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: home.categories.length,
-                      gridDelegate:
-                          SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 14,
-                        crossAxisSpacing: 14,
-                        childAspectRatio: 0.9,
-                      ),
-                      itemBuilder: (context, index) {
-                        final category = home.categories[index];
-
-                        return CategoryCard(category: category);
-                      },
-                    ),
-                  ),
+          /// 🔥 HEADER
+          Container(
+            width: double.infinity,
+            padding: EdgeInsets.only(top: 60, bottom: 25),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF0D9488),
+                  Color(0xFF14B8A6),
                 ],
               ),
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(30),
+              ),
+            ),
+            child: Column(
+              children: [
+                Text(
+                  "الأقسام",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 6),
+                Text(
+                  "اختر القسم المناسب",
+                  style: TextStyle(color: Colors.white70),
+                ),
+              ],
+            ),
+          ),
+
+          /// 🧩 CONTENT
+          Expanded(
+            child: home.loading
+                ? Center(child: CircularProgressIndicator())
+
+                : GridView.builder(
+                    padding: EdgeInsets.all(16),
+                    itemCount: home.categories.length,
+                    gridDelegate:
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      mainAxisSpacing: 14,
+                      crossAxisSpacing: 14,
+                      childAspectRatio: 0.9,
+                    ),
+                    itemBuilder: (context, index) {
+                      return CategoryCard(
+                        category: home.categories[index],
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
   }

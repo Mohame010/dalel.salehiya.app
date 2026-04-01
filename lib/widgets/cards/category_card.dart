@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../models/category_model.dart';
 import '../../routes/app_routes.dart';
 
@@ -52,15 +54,31 @@ class _CategoryCardState extends State<CategoryCard> {
             child: Stack(
               children: [
 
-                /// 🖼 IMAGE
+                /// 🖼 IMAGE (🔥 Cached)
                 Positioned.fill(
-                  child: Image.network(
-                    widget.category.image,
+                  child: CachedNetworkImage(
+                    imageUrl: widget.category.image,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
+
+                    /// ⏳ Loading
+                    placeholder: (context, url) => Container(
+                      color: Colors.grey[200],
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                        ),
+                      ),
+                    ),
+
+                    /// ❌ Error
+                    errorWidget: (context, url, error) => Container(
                       color: Colors.grey[300],
                       child: Icon(Icons.image),
                     ),
+
+                    /// ⚡ Performance
+                    memCacheWidth: 400,
+                    memCacheHeight: 400,
                   ),
                 ),
 
@@ -80,7 +98,7 @@ class _CategoryCardState extends State<CategoryCard> {
                   ),
                 ),
 
-                /// 🔥 GLASS CARD تحت
+                /// 🔥 GLASS CARD
                 Positioned(
                   bottom: 10,
                   left: 10,

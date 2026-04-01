@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
 import '../../models/item_model.dart';
 
 class ItemCard extends StatelessWidget {
@@ -13,27 +15,47 @@ class ItemCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: theme.dividerColor),
+        boxShadow: [
+          BoxShadow(
+            blurRadius: 8,
+            color: Colors.black.withOpacity(0.05),
+          )
+        ],
       ),
 
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          /// 🖼 IMAGE
+          /// 🖼 IMAGE (🔥 Cached)
           AspectRatio(
-            aspectRatio: 1.2, // 🔥 أهم حاجة تمنع الفراغ
+            aspectRatio: 1.2,
             child: ClipRRect(
               borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.network(
-                item.image,
+                  BorderRadius.vertical(top: Radius.circular(14)),
+              child: CachedNetworkImage(
+                imageUrl: item.image,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Container(
+
+                /// ⏳ Loading
+                placeholder: (context, url) => Container(
+                  color: Colors.grey[200],
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                ),
+
+                /// ❌ Error
+                errorWidget: (context, url, error) => Container(
                   color: theme.cardColor,
                   child: Icon(Icons.image, size: 30),
                 ),
+
+                /// ⚡ Performance
+                memCacheWidth: 300,
+                memCacheHeight: 300,
               ),
             ),
           ),
@@ -41,12 +63,12 @@ class ItemCard extends StatelessWidget {
           /// 📄 INFO
           Padding(
             padding: const EdgeInsets.symmetric(
-                horizontal: 8, vertical: 6),
+                horizontal: 10, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
 
-                /// NAME
+                /// 🏷 NAME
                 Text(
                   item.name,
                   maxLines: 1,
@@ -57,15 +79,23 @@ class ItemCard extends StatelessWidget {
                   ),
                 ),
 
-                SizedBox(height: 4),
+                SizedBox(height: 6),
 
-                /// PRICE
-                Text(
-                  "${item.price} ج",
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.primary,
+                /// 💰 PRICE
+                Container(
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    "${item.price} ج",
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],

@@ -7,6 +7,9 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
+/// 🔥 Hive (Offline)
+import 'package:hive_flutter/hive_flutter.dart';
+
 /// 🔹 Providers
 import 'providers/auth_provider.dart';
 import 'providers/home_provider.dart';
@@ -18,7 +21,7 @@ import 'core/theme/app_theme_provider.dart';
 /// 🔹 Routes
 import 'routes/app_routes.dart';
 
-/// 🔥 مهم جدًا (علشان نفتح شاشة من أي مكان)
+/// 🔥 Navigator Key
 final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey<NavigatorState>();
 
@@ -30,13 +33,17 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
+  /// 🔥 Hive Init (Offline)
+  await Hive.initFlutter();
+  await Hive.openBox('appData');
+
   /// 🔥 OneSignal Init
   OneSignal.initialize("85026b5a-4e49-4e87-8379-6758fb5d7167");
 
   /// 🔔 طلب إذن الإشعارات
   OneSignal.Notifications.requestPermission(true);
 
-  /// 🔥 لما المستخدم يضغط على الإشعار
+  /// 🔥 التعامل مع الضغط على الإشعار
   OneSignal.Notifications.addClickListener((event) async {
 
     final data = event.notification.additionalData;
@@ -76,9 +83,9 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
 
-        /// ✅ تعديل هنا (حل مشكلة Guest)
+        /// 🔥 Auth + تحميل المستخدم
         ChangeNotifierProvider(
-          create: (_) => AuthProvider()..loadUser(), // 🔥 مهم جدًا
+          create: (_) => AuthProvider()..loadUser(),
         ),
 
         ChangeNotifierProvider(create: (_) => HomeProvider()),
@@ -89,7 +96,7 @@ class MyApp extends StatelessWidget {
         builder: (context, themeProvider, _) {
 
           return MaterialApp(
-            navigatorKey: navigatorKey, // 👈 مهم جدًا
+            navigatorKey: navigatorKey,
 
             debugShowCheckedModeBanner: false,
 
@@ -102,8 +109,8 @@ class MyApp extends StatelessWidget {
             initialRoute: AppRoutes.splash,
             onGenerateRoute: AppRoutes.generateRoute,
 
-            /// 🌍 Localization (جاهز)
-            locale: const Locale('en'),
+            /// 🌍 Localization
+            locale: const Locale('ar'), // 🔥 خليها عربي
           );
         },
       ),

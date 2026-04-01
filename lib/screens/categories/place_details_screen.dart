@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import '../../models/place_model.dart';
 import '../../models/item_model.dart';
@@ -26,20 +28,35 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           ModalRoute.of(context)!.settings.arguments as PlaceModel;
 
       loadItems(place.id);
-
       _loaded = true;
     }
   }
 
   Future<void> loadItems(int placeId) async {
+    final box = Hive.box('appData');
+
     try {
       final res = await ApiService.get('/items/$placeId');
 
       items = (res as List)
           .map((e) => ItemModel.fromJson(e))
           .toList();
+
+      await box.put('items_$placeId', res);
+
+      print("✅ ITEMS FROM API");
+
     } catch (e) {
-      print(e);
+
+      print("⚠️ LOAD ITEMS FROM CACHE");
+
+      final cached = box.get('items_$placeId') ?? [];
+
+      items = (cached as List)
+          .map((e) => ItemModel.fromJson(
+                Map<String, dynamic>.from(e),
+              ))
+          .toList();
     }
 
     setState(() => loading = false);
@@ -56,13 +73,12 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
 
-      /// 🔘 Bottom Buttons
+      /// 🔘 Buttons
       bottomNavigationBar: Container(
         padding: EdgeInsets.all(12),
         child: Row(
           children: [
 
-            /// 📞 Call
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -70,15 +86,11 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                 },
                 icon: Icon(Icons.phone),
                 label: Text("اتصل"),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.primary,
-                ),
               ),
             ),
 
             SizedBox(width: 10),
 
-            /// 💬 WhatsApp
             Expanded(
               child: ElevatedButton.icon(
                 onPressed: () {
@@ -99,39 +111,41 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
       body: loading
           ? Center(child: CircularProgressIndicator())
+
           : CustomScrollView(
               slivers: [
 
-                /// 🖼 Image
+                /// 🖼 IMAGE (🔥 FIXED HERE)
                 SliverAppBar(
                   expandedHeight: 250,
                   pinned: true,
                   backgroundColor: theme.scaffoldBackgroundColor,
-                  iconTheme: IconThemeData(
-                    color: theme.iconTheme.color,
-                  ),
 
                   flexibleSpace: FlexibleSpaceBar(
-                    background: Image.network(
-                      place.image,
+                    background: CachedNetworkImage(
+                      imageUrl: place.image,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        color: theme.cardColor,
-                        child: Icon(Icons.image, size: 50),
+
+                      placeholder: (_, __) => Container(
+                        color: Colors.grey[200],
+                      ),
+
+                      errorWidget: (_, __, ___) => Container(
+                        color: Colors.grey[300],
+                        child: Icon(Icons.image),
                       ),
                     ),
                   ),
                 ),
 
-                /// 📄 Details
+                /// 📄 DETAILS
                 SliverToBoxAdapter(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
 
-                        /// 🏷 Name
                         Text(
                           place.name,
                           style: TextStyle(
@@ -142,67 +156,26 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
                         SizedBox(height: 10),
 
-                        /// 📍 Address Card
-                        _buildCard(
-                          context,
-                          child: Row(
-                            children: [
-                              Icon(Icons.location_on,
-                                  color: theme.colorScheme.error),
-                              SizedBox(width: 8),
-                              Expanded(child: Text(place.address)),
-                            ],
-                          ),
+                        _card(theme, Icons.location_on, place.address),
+
+                        SizedBox(height: 10),
+
+                        _card(
+                          theme,
+                          Icons.access_time,
+                          "${place.openTime} - ${place.closeTime}",
                         ),
 
-                        SizedBox(height: 15),
+                        SizedBox(height: 10),
 
-                        /// 🕒 Time Card
-                        _buildCard(
-                          context,
-                          child: Column(
-                            children: [
-
-                              Row(
-                                children: [
-                                  Icon(Icons.access_time),
-                                  SizedBox(width: 8),
-                                  Text("${place.openTime} - ${place.closeTime}"),
-                                ],
-                              ),
-
-                              SizedBox(height: 6),
-
-                              Row(
-                                children: [
-                                  Icon(Icons.calendar_today, size: 18),
-                                  SizedBox(width: 8),
-                                  Text(place.workingDays),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        SizedBox(height: 15),
-
-                        /// 📞 Phone Card
-                        _buildCard(
-                          context,
-                          color: theme.colorScheme.primary.withOpacity(0.1),
-                          child: Row(
-                            children: [
-                              Icon(Icons.phone,
-                                  color: theme.colorScheme.primary),
-                              SizedBox(width: 8),
-                              Text(place.phone),
-                            ],
-                          ),
+                        _card(
+                          theme,
+                          Icons.calendar_today,
+                          place.workingDays,
                         ),
 
                         SizedBox(height: 20),
 
-                        /// 🍔 Items Title
                         Text(
                           "المنتجات",
                           style: TextStyle(
@@ -229,28 +202,26 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
                       ],
                     ),
                   ),
-                )
+                ),
               ],
             ),
     );
   }
 
-  /// 💎 Reusable Card (Dark Mode Safe)
-  Widget _buildCard(BuildContext context,
-      {required Widget child, Color? color}) {
-
-    final theme = Theme.of(context);
-
+  Widget _card(ThemeData theme, IconData icon, String text) {
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: color ?? theme.cardColor,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.dividerColor,
-        ),
       ),
-      child: child,
+      child: Row(
+        children: [
+          Icon(icon, color: theme.colorScheme.primary),
+          SizedBox(width: 8),
+          Expanded(child: Text(text)),
+        ],
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class HomeBanner extends StatefulWidget {
   final List ads;
@@ -39,9 +40,7 @@ class _HomeBannerState extends State<HomeBanner> {
             return GestureDetector(
               onTap: () async {
 
-                final url = ad.link; // 👈 مهم
-
-                print("CLICK AD: $url");
+                final url = ad.link;
 
                 if (url != null && url != "") {
                   final uri = Uri.parse(url);
@@ -71,15 +70,30 @@ class _HomeBannerState extends State<HomeBanner> {
                   child: Stack(
                     children: [
 
-                      /// 🖼 Image
+                      /// 🖼 IMAGE (🔥 Cached)
                       Positioned.fill(
-                        child: Image.network(
-                          ad.image,
+                        child: CachedNetworkImage(
+                          imageUrl: ad.image,
                           fit: BoxFit.cover,
+
+                          placeholder: (_, __) => Container(
+                            color: Colors.grey[200],
+                            child: Center(
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+
+                          errorWidget: (_, __, ___) => Container(
+                            color: Colors.grey[300],
+                            child: Icon(Icons.image),
+                          ),
+
+                          memCacheWidth: 800,
+                          memCacheHeight: 400,
                         ),
                       ),
 
-                      /// 🌑 Overlay (UI حلو)
+                      /// 🌑 Overlay
                       Positioned.fill(
                         child: Container(
                           decoration: BoxDecoration(
@@ -109,7 +123,7 @@ class _HomeBannerState extends State<HomeBanner> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: widget.ads.asMap().entries.map((entry) {
             return Container(
-              width: current == entry.key ? 12 : 6,
+              width: current == entry.key ? 14 : 6,
               height: 6,
               margin: EdgeInsets.symmetric(horizontal: 3),
               decoration: BoxDecoration(
