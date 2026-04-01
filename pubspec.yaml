@@ -33,20 +33,37 @@ dependencies:
 
   # ✨ Animations
   flutter_animate: ^4.5.0
+
+  # 🔔 Notifications
   onesignal_flutter: ^5.4.6
-  rename: ^3.1.0
+
+  # 🔥 Firebase
   firebase_core_dart: ^1.0.1
   firebase_auth: ^6.3.0
   cloud_firestore: ^6.2.0
   firebase_storage: ^13.2.0
+
+  # 💾 Offline (Hive)
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+
+  # 🏷 Rename App
+  rename: ^3.1.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
+
+  # 🔥 App Icon Generator
+  flutter_launcher_icons: ^0.14.4
+
+# 🔥 إعداد اللوجو
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/logo.png"
 
 flutter:
 
@@ -56,7 +73,7 @@ flutter:
   assets:
     - assets/images/
 
-  # 🔤 Fonts (اختياري)
+  # 🔤 Fonts
   fonts:
     - family: Cairo
       fonts:
