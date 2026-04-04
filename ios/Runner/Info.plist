@@ -2,30 +2,45 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+
+	<!-- ✅ اسم التطبيق -->
 	<key>CFBundleDisplayName</key>
-	<string>App</string>
+	<string>دليل الصالحية</string>
+
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+
 	<key>CFBundleName</key>
-	<string>app</string>
+	<string>دليل الصالحية</string>
+
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
+
 	<key>CFBundleSignature</key>
 	<string>????</string>
+
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
+
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+
+	<!-- 🎬 Scene -->
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -47,18 +62,25 @@
 			</array>
 		</dict>
 	</dict>
+
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+	<!-- 🚀 Launch Screen -->
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
+
 	<key>UIMainStoryboardFile</key>
 	<string>Main</string>
+
+	<!-- 📱 الاتجاهات -->
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
 	<key>UISupportedInterfaceOrientations~ipad</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
@@ -66,5 +88,38 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+
+	<!-- ================== 🔥 PERMISSIONS ================== -->
+
+	<!-- 📍 Location -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>نحتاج إلى موقعك لعرض الأماكن القريبة منك</string>
+
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>نستخدم موقعك لتحسين تجربة التطبيق</string>
+
+	<!-- 📷 Camera -->
+	<key>NSCameraUsageDescription</key>
+	<string>نحتاج الكاميرا لالتقاط الصور</string>
+
+	<!-- 🖼 Photo Library -->
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>نحتاج الوصول للصور لاختيار صورة</string>
+
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>نحتاج حفظ الصور على جهازك</string>
+
+	<!-- 🎤 Microphone -->
+	<key>NSMicrophoneUsageDescription</key>
+	<string>نحتاج المايك لتسجيل الصوت</string>
+
+	<!-- 🔔 Notifications -->
+	<key>NSUserNotificationUsageDescription</key>
+	<string>نرسل إشعارات لتنبيهك بأهم التحديثات</string>
+
+	<!-- 🌐 Tracking (اختياري للإعلانات) -->
+	<key>NSUserTrackingUsageDescription</key>
+	<string>نستخدم البيانات لتحسين الإعلانات</string>
+
 </dict>
 </plist>
