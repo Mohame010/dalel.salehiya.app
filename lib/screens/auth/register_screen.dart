@@ -56,8 +56,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   colors: [
-                    Color(0xFF0D9488),
-                    Color(0xFF14B8A6),
+                    Color(0xFF03819B),
+                    Color(0xFFDC0C49),
                   ],
                 ),
                 borderRadius: BorderRadius.vertical(
@@ -163,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       child: ElevatedButton(
                         onPressed: auth.loading ? null : register,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Color(0xFF0D9488),
+                          backgroundColor: Color(0xFF03819B),
                           padding: EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(14),

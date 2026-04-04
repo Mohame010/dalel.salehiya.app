@@ -98,7 +98,7 @@ class _TransportScreenState extends State<TransportScreen>
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: Color(0xFF0D9488),
+                  color: Color(0xFF03819B),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 labelColor: Colors.white,

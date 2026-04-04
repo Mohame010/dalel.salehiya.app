@@ -129,7 +129,7 @@ class _HomeBannerState extends State<HomeBanner> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
                 color: current == entry.key
-                    ? Color(0xFF0D9488)
+                    ? Color(0xFF03819B)
                     : Colors.grey,
               ),
             );

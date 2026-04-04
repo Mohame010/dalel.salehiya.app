@@ -20,7 +20,7 @@ class AboutScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Color(0xFF0D9488),
+                color: Color(0xFF03819B),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -30,7 +30,7 @@ class AboutScreen extends StatelessWidget {
                     radius: 40,
                     backgroundColor: Colors.white,
                     child: Icon(Icons.location_city,
-                        size: 40, color: Color(0xFF0D9488)),
+                        size: 40, color: Color(0xFF03819B)),
                   ),
 
                   SizedBox(height: 10),

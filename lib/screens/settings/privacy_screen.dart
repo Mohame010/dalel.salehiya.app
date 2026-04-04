@@ -17,8 +17,8 @@ class PrivacyScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF0D9488),
-                  Color(0xFF14B8A6),
+                  Color(0xFF03819B),
+                  Color(0xFFDC0C49),
                 ],
               ),
               borderRadius: BorderRadius.vertical(
@@ -132,10 +132,10 @@ class PrivacyScreen extends StatelessWidget {
           Container(
             padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Color(0xFF0D9488).withOpacity(0.1),
+              color: Color(0xFF03819B).withOpacity(0.1),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, color: Color(0xFF0D9488)),
+            child: Icon(icon, color: Color(0xFF03819B)),
           ),
 
           SizedBox(width: 10),

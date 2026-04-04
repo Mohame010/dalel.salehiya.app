@@ -11,19 +11,27 @@ class _SplashScreenState extends State<SplashScreen>
 
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
 
-    /// 🎬 Animation
+    /// 🎬 Animation Controller
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
     );
 
+    /// ✨ Fade Animation
     _fadeAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeIn);
+
+    /// 🔍 Scale Animation (تكبير تدريجي)
+    _scaleAnimation =
+        Tween<double>(begin: 0.7, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
+    );
 
     _controller.forward();
 
@@ -35,11 +43,19 @@ class _SplashScreenState extends State<SplashScreen>
 
     final token = await AuthService.getToken();
 
+    if (!mounted) return;
+
     if (token != null) {
       Navigator.pushReplacementNamed(context, '/home');
     } else {
       Navigator.pushReplacementNamed(context, '/login');
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -51,8 +67,8 @@ class _SplashScreenState extends State<SplashScreen>
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              Color(0xFF0D9488),
-              Color(0xFF14B8A6),
+              Color(0xFF03819B),
+              Color(0xFF026C83),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -62,50 +78,73 @@ class _SplashScreenState extends State<SplashScreen>
         child: FadeTransition(
           opacity: _fadeAnimation,
 
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+          child: ScaleTransition(
+            scale: _scaleAnimation,
 
-              /// 🏙 Logo
-              Container(
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+
+                /// 🏙 LOGO
+                Container(
+                  padding: EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 15,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/images/splash.png',
+                      width: 90,
+                      height: 90,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
-                child: Icon(
-                  Icons.location_city,
-                  size: 50,
-                  color: Color(0xFF0D9488),
+
+                SizedBox(height: 25),
+
+                /// 🏷 App Name
+                Text(
+                  "دليل الصالحية",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                    letterSpacing: 1,
+                  ),
                 ),
-              ),
 
-              SizedBox(height: 20),
+                SizedBox(height: 10),
 
-              /// 🏷 App Name
-              Text(
-                "دليل الصالحية",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                Text(
+                  "اكتشف كل ما تحتاجه في مدينتك",
+                  style: TextStyle(
+                    color: Colors.white70,
+                    fontSize: 14,
+                  ),
                 ),
-              ),
 
-              SizedBox(height: 8),
+                SizedBox(height: 50),
 
-              Text(
-                "اكتشف كل ما تحتاجه في مدينتك",
-                style: TextStyle(color: Colors.white70),
-              ),
-
-              SizedBox(height: 40),
-
-              /// 🔄 Loading
-              CircularProgressIndicator(
-                color: Colors.white,
-              ),
-            ],
+                /// 🔄 Loading
+                SizedBox(
+                  width: 25,
+                  height: 25,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

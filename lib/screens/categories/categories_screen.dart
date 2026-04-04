@@ -36,8 +36,8 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF0D9488),
-                  Color(0xFF14B8A6),
+                  Color(0xFF03819B),
+                  Color(0xFFDC0C49),
                 ],
               ),
               borderRadius: BorderRadius.vertical(

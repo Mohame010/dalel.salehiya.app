@@ -32,7 +32,7 @@ class ContactScreen extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Color(0xFF0D9488),
+                color: Color(0xFF03819B),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -96,8 +96,8 @@ class ContactScreen extends StatelessWidget {
         ),
         tileColor: Colors.grey.withOpacity(0.1),
         leading: CircleAvatar(
-          backgroundColor: Color(0xFF0D9488).withOpacity(0.1),
-          child: Icon(icon, color: Color(0xFF0D9488)),
+          backgroundColor: Color(0xFF03819B).withOpacity(0.1),
+          child: Icon(icon, color: Color(0xFF03819B)),
         ),
         title: Text(title),
         trailing: Icon(Icons.arrow_forward_ios, size: 16),
