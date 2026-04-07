@@ -48,4 +48,17 @@ class AuthService {
   static Future<String?> getToken() async {
     return await StorageService.getToken();
   }
+
+  /// ❌ DELETE ACCOUNT (🔥 أهم جزء)
+  static Future<bool> deleteAccount() async {
+    try {
+      final res = await ApiService.delete('/delete-my-account');
+
+      return res['success'] == true;
+
+    } catch (e) {
+      print("Delete Account Error: $e");
+      return false;
+    }
+  }
 }

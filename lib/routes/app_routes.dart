@@ -3,15 +3,13 @@ import 'package:flutter/material.dart';
 import '../screens/splash/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
-import '../screens/home/home_screen.dart';
-import '../screens/categories/places_screen.dart'; // 👈 مهم
+import '../screens/home/main_screen.dart';
+import '../screens/categories/places_screen.dart';
 import '../screens/categories/place_details_screen.dart';
 import '../screens/transport/transport_screen.dart';
-import '../screens/home/main_screen.dart';
 import '../screens/settings/privacy_screen.dart';
 import '../screens/settings/contact_screen.dart';
 import '../screens/settings/about_screen.dart';
-
 
 class AppRoutes {
   static const splash = '/';
@@ -22,18 +20,8 @@ class AppRoutes {
   static const placeDetails = '/place-details';
   static const transport = '/transport';
 
-  /// 🔀 Route Generator
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
-
-      case '/about':
-        return MaterialPageRoute(builder: (_) => AboutScreen());
-
-      case '/privacy':
-       return MaterialPageRoute(builder: (_) => PrivacyScreen());
-
-      case '/contact':
-       return MaterialPageRoute(builder: (_) => ContactScreen());
 
       case splash:
         return MaterialPageRoute(builder: (_) => SplashScreen());
@@ -60,14 +48,21 @@ class AppRoutes {
         );
 
       case transport:
-        return MaterialPageRoute(
-          builder: (_) => TransportScreen(),
-        );
+        return MaterialPageRoute(builder: (_) => TransportScreen());
+
+      case '/about':
+        return MaterialPageRoute(builder: (_) => AboutScreen());
+
+      case '/privacy':
+        return MaterialPageRoute(builder: (_) => PrivacyScreen());
+
+      case '/contact':
+        return MaterialPageRoute(builder: (_) => ContactScreen());
 
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
-            body: Center(child: Text("No route found")),
+            body: Center(child: Text("No route found ❌")),
           ),
         );
     }

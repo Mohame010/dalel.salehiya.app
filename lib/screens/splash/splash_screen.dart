@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../services/settings_service.dart'; // 🔥 جديد
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -17,17 +18,14 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    /// 🎬 Animation Controller
     _controller = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
     );
 
-    /// ✨ Fade Animation
     _fadeAnimation =
         CurvedAnimation(parent: _controller, curve: Curves.easeIn);
 
-    /// 🔍 Scale Animation (تكبير تدريجي)
     _scaleAnimation =
         Tween<double>(begin: 0.7, end: 1.0).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeOutBack),
@@ -42,13 +40,22 @@ class _SplashScreenState extends State<SplashScreen>
     await Future.delayed(const Duration(seconds: 3));
 
     final token = await AuthService.getToken();
+    final requireLogin = await SettingsService.requireLogin(); // 🔥 الجديد
 
     if (!mounted) return;
 
-    if (token != null) {
+    /// 🔐 لو التسجيل إجباري
+    if (requireLogin) {
+      if (token != null) {
+        Navigator.pushReplacementNamed(context, '/home');
+      } else {
+        Navigator.pushReplacementNamed(context, '/login');
+      }
+    }
+
+    /// 👀 لو Guest مسموح
+    else {
       Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      Navigator.pushReplacementNamed(context, '/login');
     }
   }
 
@@ -85,7 +92,6 @@ class _SplashScreenState extends State<SplashScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
 
-                /// 🏙 LOGO
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -111,7 +117,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                 SizedBox(height: 25),
 
-                /// 🏷 App Name
                 Text(
                   "دليل الصالحية",
                   style: TextStyle(
@@ -134,7 +139,6 @@ class _SplashScreenState extends State<SplashScreen>
 
                 SizedBox(height: 50),
 
-                /// 🔄 Loading
                 SizedBox(
                   width: 25,
                   height: 25,

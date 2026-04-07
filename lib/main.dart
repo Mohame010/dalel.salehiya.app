@@ -13,6 +13,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 /// 🔹 Providers
 import 'providers/auth_provider.dart';
 import 'providers/home_provider.dart';
+import 'providers/search_provider.dart';
 
 /// 🔹 Theme
 import 'core/theme/app_theme.dart';
@@ -33,42 +34,32 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  /// 🔥 Hive Init (Offline)
+  /// 🔥 Hive Init
   await Hive.initFlutter();
   await Hive.openBox('appData');
 
-  /// 🔥 OneSignal Init
+  /// 🔥 OneSignal
   OneSignal.initialize("85026b5a-4e49-4e87-8379-6758fb5d7167");
 
-  /// 🔔 طلب إذن الإشعارات
   OneSignal.Notifications.requestPermission(true);
 
-  /// 🔥 التعامل مع الضغط على الإشعار
   OneSignal.Notifications.addClickListener((event) async {
 
     final data = event.notification.additionalData;
-
-    print("🔔 NOTIFICATION DATA: $data");
 
     if (data == null) return;
 
     final openType = data['openType'];
     final url = data['url'];
 
-    /// 🌐 فتح لينك
     if (openType == "url" && url != null) {
-
       final uri = Uri.parse(url);
 
       await launchUrl(
         uri,
         mode: LaunchMode.externalApplication,
       );
-    }
-
-    /// 📱 فتح شاشة
-    else if (openType == "screen") {
-
+    } else if (openType == "screen") {
       navigatorKey.currentState?.pushNamed('/home');
     }
   });
@@ -83,13 +74,20 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
 
-        /// 🔥 Auth + تحميل المستخدم
+        /// 🔥 Auth
         ChangeNotifierProvider(
           create: (_) => AuthProvider()..loadUser(),
         ),
 
         ChangeNotifierProvider(create: (_) => HomeProvider()),
-        ChangeNotifierProvider(create: (_) => AppThemeProvider()),
+
+        /// 🔍 SEARCH
+        ChangeNotifierProvider(create: (_) => SearchProvider()),
+
+        /// 🌙 THEME (🔥 أهم تعديل)
+        ChangeNotifierProvider(
+          create: (_) => AppThemeProvider()..loadTheme(), // 🔥 FIX
+        ),
       ],
 
       child: Consumer<AppThemeProvider>(
@@ -97,7 +95,6 @@ class MyApp extends StatelessWidget {
 
           return MaterialApp(
             navigatorKey: navigatorKey,
-
             debugShowCheckedModeBanner: false,
 
             /// 🎨 Themes
@@ -109,8 +106,8 @@ class MyApp extends StatelessWidget {
             initialRoute: AppRoutes.splash,
             onGenerateRoute: AppRoutes.generateRoute,
 
-            /// 🌍 Localization
-            locale: const Locale('ar'), // 🔥 خليها عربي
+            /// 🌍 Arabic
+            locale: const Locale('ar'),
           );
         },
       ),

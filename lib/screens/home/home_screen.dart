@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/home_provider.dart';
+import '../../providers/search_provider.dart';
 import '../../widgets/home/home_banner.dart';
 import '../../widgets/home/home_categories.dart';
 import '../../routes/app_routes.dart';
+import '../../models/place_model.dart'; // 🔥 مهم
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -13,6 +16,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
 
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
@@ -20,6 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
     Future.microtask(() {
       Provider.of<HomeProvider>(context, listen: false).loadHome();
     });
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
@@ -38,7 +49,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// 🔥 HEADER (Premium)
+                    /// 🔥 HEADER
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(
@@ -46,19 +57,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                "👋 أهلاً بيك",
-                                style: TextStyle(
-                                  color: Colors.grey,
-                                ),
-                              ),
-                              Text(
-                                "دليل الصالحية",
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
+                              Text("👋 أهلاً بيك",
+                                  style: TextStyle(color: Colors.grey)),
+                              Text("دليل الصالحية",
+                                  style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                           Spacer(),
@@ -74,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
 
-                    /// 🔍 SEARCH (أفخم)
+                    /// 🔍 SEARCH
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Container(
@@ -99,11 +103,85 @@ class _HomeScreenState extends State<HomeScreen> {
                                   hintText: "ابحث عن مطعم أو محل...",
                                   border: InputBorder.none,
                                 ),
+                                onChanged: (value) {
+                                  if (_debounce?.isActive ?? false) {
+                                    _debounce!.cancel();
+                                  }
+
+                                  _debounce = Timer(
+                                      Duration(milliseconds: 500), () {
+                                    context
+                                        .read<SearchProvider>()
+                                        .search(value);
+                                  });
+                                },
                               ),
                             ),
                           ],
                         ),
                       ),
+                    ),
+
+                    SizedBox(height: 10),
+
+                    /// 🔍 RESULTS
+                    Consumer<SearchProvider>(
+                      builder: (context, search, child) {
+
+                        if (search.loading) {
+                          return Padding(
+                            padding: EdgeInsets.all(16),
+                            child: Center(
+                                child: CircularProgressIndicator()),
+                          );
+                        }
+
+                        if (search.places.isEmpty &&
+                            search.items.isEmpty) {
+                          return SizedBox();
+                        }
+
+                        return Column(
+                          children: [
+
+                            /// 🏪 Places
+                            ...search.places.map((p) => ListTile(
+                                  title: Text(p['name']),
+                                  leading: Icon(Icons.store),
+
+                                  onTap: () {
+                                    context.read<SearchProvider>().clear();
+
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.placeDetails,
+                                      arguments:
+                                          PlaceModel.fromJson(p), // 🔥 FIX
+                                    );
+                                  },
+                                )),
+
+                            /// 🍔 Items
+                            ...search.items.map((i) => ListTile(
+                                  title: Text(i['name']),
+                                  leading: Icon(Icons.fastfood),
+
+                                  onTap: () {
+                                    context.read<SearchProvider>().clear();
+
+                                    Navigator.pushNamed(
+                                      context,
+                                      AppRoutes.placeDetails,
+                                      arguments: PlaceModel.fromJson({
+                                        "id": i['place_id'],
+                                        "name": i['name'],
+                                      }),
+                                    );
+                                  },
+                                )),
+                          ],
+                        );
+                      },
                     ),
 
                     SizedBox(height: 18),
@@ -113,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     SizedBox(height: 20),
 
-                    /// 🚗 TRANSPORT (Premium Card)
+                    /// 🚗 TRANSPORT
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GestureDetector(
@@ -131,18 +209,9 @@ class _HomeScreenState extends State<HomeScreen> {
                               ],
                             ),
                             borderRadius: BorderRadius.circular(18),
-                            boxShadow: [
-                              BoxShadow(
-                                blurRadius: 10,
-                                color: Colors.teal.withOpacity(0.3),
-                                offset: Offset(0, 5),
-                              )
-                            ],
                           ),
                           child: Row(
                             children: [
-
-                              /// ICON
                               Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
@@ -152,33 +221,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                 child: Icon(Icons.directions_bus,
                                     color: Color(0xFF03819B)),
                               ),
-
                               SizedBox(width: 12),
-
-                              /// TEXT
                               Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                                crossAxisAlignment:
+                                    CrossAxisAlignment.start,
                                 children: [
-                                  Text(
-                                    "المواصلات",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                  Text(
-                                    "اعرف خطوط السير والأسعار",
-                                    style: TextStyle(
-                                      color: Colors.white70,
-                                      fontSize: 12,
-                                    ),
-                                  ),
+                                  Text("المواصلات",
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold)),
+                                  Text("اعرف خطوط السير والأسعار",
+                                      style: TextStyle(
+                                          color: Colors.white70)),
                                 ],
                               ),
-
                               Spacer(),
-
                               Icon(Icons.arrow_forward_ios,
                                   color: Colors.white, size: 16),
                             ],
@@ -191,14 +248,12 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     /// 🧩 TITLE
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        "الأقسام",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text("الأقسام",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold)),
                     ),
 
                     SizedBox(height: 12),

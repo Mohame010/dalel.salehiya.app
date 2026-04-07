@@ -117,9 +117,5 @@
 	<key>NSUserNotificationUsageDescription</key>
 	<string>نرسل إشعارات لتنبيهك بأهم التحديثات</string>
 
-	<!-- 🌐 Tracking (اختياري للإعلانات) -->
-	<key>NSUserTrackingUsageDescription</key>
-	<string>نستخدم البيانات لتحسين الإعلانات</string>
-
 </dict>
 </plist>

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/place_model.dart';
 import '../../routes/app_routes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import '../../services/favorite_service.dart'; // 🔥 جديد
 
 class PlaceCard extends StatefulWidget {
   final PlaceModel place;
@@ -15,6 +16,15 @@ class PlaceCard extends StatefulWidget {
 class _PlaceCardState extends State<PlaceCard> {
 
   bool isPressed = false;
+  bool isFav = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    /// ❤️ حالة المفضلة
+    isFav = FavoriteService.isFavorite(widget.place.id);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,32 +74,29 @@ class _PlaceCardState extends State<PlaceCard> {
                 child: Stack(
                   children: [
 
-              CachedNetworkImage(
-                imageUrl: place.image,
-                 height: 160,
-                 width: double.infinity,
-                 fit: BoxFit.cover,
+                    CachedNetworkImage(
+                      imageUrl: place.image,
+                      height: 160,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
 
-                   /// ⚡ أثناء التحميل
-                  placeholder: (context, url) => Container(
-                  height: 160,
-                  color: Colors.grey[200],
-                  child: Center(child: CircularProgressIndicator()),
+                      placeholder: (context, url) => Container(
+                        height: 160,
+                        color: Colors.grey[200],
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+
+                      errorWidget: (context, url, error) => Container(
+                        height: 160,
+                        color: Colors.grey[300],
+                        child: Icon(Icons.image, size: 40),
+                      ),
+
+                      memCacheWidth: 400,
+                      memCacheHeight: 300,
                     ),
 
-                   /// ❌ لو الصورة بايظة
-                 errorWidget: (context, url, error) => Container(
-                  height: 160,
-                  color: Colors.grey[300],
-                  child: Icon(Icons.image, size: 40),
-                  ),
-
-                    /// 🚀 تحسين الأداء
-                    memCacheWidth: 400,
-                    memCacheHeight: 300,
-                     ),
-
-                    /// 🌑 Overlay خفيف
+                    /// 🌑 Overlay
                     Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
@@ -121,6 +128,35 @@ class _PlaceCardState extends State<PlaceCard> {
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 10,
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    /// ❤️ FAVORITE BUTTON 🔥
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: GestureDetector(
+                        onTap: () async {
+                          await FavoriteService.toggle(place.id);
+
+                          setState(() {
+                            isFav = !isFav;
+                          });
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            isFav
+                                ? Icons.favorite
+                                : Icons.favorite_border,
+                            color: Colors.red,
+                            size: 20,
                           ),
                         ),
                       ),

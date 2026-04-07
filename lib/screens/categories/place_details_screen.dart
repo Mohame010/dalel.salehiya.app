@@ -6,6 +6,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../models/place_model.dart';
 import '../../models/item_model.dart';
 import '../../services/api_service.dart';
+import '../../services/favorite_service.dart'; // 🔥 جديد
 import '../../widgets/cards/item_card.dart';
 
 class PlaceDetailsScreen extends StatefulWidget {
@@ -19,13 +20,20 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
   bool loading = true;
   bool _loaded = false;
 
+  late PlaceModel place;
+
+  bool isFav = false; // ❤️ جديد
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     if (!_loaded) {
-      final place =
+      place =
           ModalRoute.of(context)!.settings.arguments as PlaceModel;
+
+      /// ❤️ حالة المفضلة
+      isFav = FavoriteService.isFavorite(place.id);
 
       loadItems(place.id);
       _loaded = true;
@@ -44,11 +52,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
       await box.put('items_$placeId', res);
 
-      print("✅ ITEMS FROM API");
-
     } catch (e) {
-
-      print("⚠️ LOAD ITEMS FROM CACHE");
 
       final cached = box.get('items_$placeId') ?? [];
 
@@ -62,16 +66,55 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
     setState(() => loading = false);
   }
 
+  /// 📞 اتصال
+  Future<void> call() async {
+    if (place.phone == null || place.phone!.isEmpty) return;
+
+    final uri = Uri.parse("tel:${place.phone}");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
+  /// 💬 واتساب
+  Future<void> whatsapp() async {
+    if (place.whatsapp == null || place.whatsapp!.isEmpty) return;
+
+    final uri = Uri.parse("https://wa.me/${place.whatsapp}");
+
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
-    final place =
-        ModalRoute.of(context)!.settings.arguments as PlaceModel;
 
     final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+
+      /// ❤️ Favorite Button
+      appBar: AppBar(
+        title: Text(place.name),
+        actions: [
+          IconButton(
+            icon: Icon(
+              isFav ? Icons.favorite : Icons.favorite_border,
+              color: Colors.red,
+            ),
+            onPressed: () async {
+              await FavoriteService.toggle(place.id);
+
+              setState(() {
+                isFav = !isFav;
+              });
+            },
+          ),
+        ],
+      ),
 
       /// 🔘 Buttons
       bottomNavigationBar: Container(
@@ -81,9 +124,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  launchUrl(Uri.parse("tel:${place.phone}"));
-                },
+                onPressed: call,
                 icon: Icon(Icons.phone),
                 label: Text("اتصل"),
               ),
@@ -93,11 +134,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
             Expanded(
               child: ElevatedButton.icon(
-                onPressed: () {
-                  launchUrl(
-                    Uri.parse("https://wa.me/${place.whatsapp}"),
-                  );
-                },
+                onPressed: whatsapp,
                 icon: Icon(Icons.chat),
                 label: Text("واتساب"),
                 style: ElevatedButton.styleFrom(
@@ -115,7 +152,7 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
           : CustomScrollView(
               slivers: [
 
-                /// 🖼 IMAGE (🔥 FIXED HERE)
+                /// 🖼 IMAGE
                 SliverAppBar(
                   expandedHeight: 250,
                   pinned: true,
@@ -123,17 +160,8 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
                   flexibleSpace: FlexibleSpaceBar(
                     background: CachedNetworkImage(
-                      imageUrl: place.image,
+                      imageUrl: place.image ?? "",
                       fit: BoxFit.cover,
-
-                      placeholder: (_, __) => Container(
-                        color: Colors.grey[200],
-                      ),
-
-                      errorWidget: (_, __, ___) => Container(
-                        color: Colors.grey[300],
-                        child: Icon(Icons.image),
-                      ),
                     ),
                   ),
                 ),
@@ -156,23 +184,27 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
                         SizedBox(height: 10),
 
-                        _card(theme, Icons.location_on, place.address),
+                        if (place.address != null)
+                          _card(theme, Icons.location_on, place.address!),
 
                         SizedBox(height: 10),
 
-                        _card(
-                          theme,
-                          Icons.access_time,
-                          "${place.openTime} - ${place.closeTime}",
-                        ),
+                        if (place.openTime != null &&
+                            place.closeTime != null)
+                          _card(
+                            theme,
+                            Icons.access_time,
+                            "${place.openTime} - ${place.closeTime}",
+                          ),
 
                         SizedBox(height: 10),
 
-                        _card(
-                          theme,
-                          Icons.calendar_today,
-                          place.workingDays,
-                        ),
+                        if (place.workingDays != null)
+                          _card(
+                            theme,
+                            Icons.calendar_today,
+                            place.workingDays!,
+                          ),
 
                         SizedBox(height: 20),
 
@@ -186,19 +218,22 @@ class _PlaceDetailsScreenState extends State<PlaceDetailsScreen> {
 
                         SizedBox(height: 10),
 
-                        GridView.builder(
-                          shrinkWrap: true,
-                          physics: NeverScrollableScrollPhysics(),
-                          itemCount: items.length,
-                          gridDelegate:
-                              SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
-                            childAspectRatio: 0.75,
-                          ),
-                          itemBuilder: (context, index) {
-                            return ItemCard(item: items[index]);
-                          },
-                        ),
+                        items.isEmpty
+                            ? Center(child: Text("لا يوجد منتجات"))
+                            : GridView.builder(
+                                shrinkWrap: true,
+                                physics:
+                                    NeverScrollableScrollPhysics(),
+                                itemCount: items.length,
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  childAspectRatio: 0.75,
+                                ),
+                                itemBuilder: (context, index) {
+                                  return ItemCard(item: items[index]);
+                                },
+                              ),
                       ],
                     ),
                   ),

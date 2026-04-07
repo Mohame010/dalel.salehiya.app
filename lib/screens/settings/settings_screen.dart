@@ -13,7 +13,6 @@ class SettingsScreen extends StatelessWidget {
     final auth = Provider.of<AuthProvider>(context);
     final theme = Provider.of<AppThemeProvider>(context);
 
-    // ✅ لون ديناميكي حسب الثيم
     final textColor = Theme.of(context).textTheme.bodyLarge?.color;
 
     return Scaffold(
@@ -46,7 +45,6 @@ class SettingsScreen extends StatelessWidget {
               child: Row(
                 children: [
 
-                  /// 👤 Avatar
                   Container(
                     padding: EdgeInsets.all(3),
                     decoration: BoxDecoration(
@@ -62,7 +60,6 @@ class SettingsScreen extends StatelessWidget {
 
                   SizedBox(width: 12),
 
-                  /// 👤 Info
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -94,14 +91,15 @@ class SettingsScreen extends StatelessWidget {
               context,
               children: [
 
+                /// 🌙 DARK MODE (🔥 FIX)
                 SettingsItem(
                   title: "الوضع الداكن",
                   icon: Icons.dark_mode,
-                  textColor: textColor, // ✅ مهم
+                  textColor: textColor,
                   trailing: Switch(
-                    value: theme.isDark,
-                    onChanged: (value) {
-                      theme.toggleTheme();
+                    value: theme.themeMode == ThemeMode.dark, // 🔥 الصح
+                    onChanged: (value) async {
+                      await theme.toggleTheme(); // 🔥 بيتحفظ
                     },
                   ),
                 ),
@@ -109,7 +107,7 @@ class SettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: "اللغة",
                   icon: Icons.language,
-                  textColor: textColor, // ✅
+                  textColor: textColor,
                   onTap: () {
                     Helpers.showSnackBar(context, "قريبًا");
                   },
@@ -127,7 +125,7 @@ class SettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: "من نحن",
                   icon: Icons.info,
-                  textColor: textColor, // ✅
+                  textColor: textColor,
                   onTap: () {
                     Navigator.pushNamed(context, '/about');
                   },
@@ -136,7 +134,7 @@ class SettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: "سياسة الخصوصية",
                   icon: Icons.privacy_tip,
-                  textColor: textColor, // ✅
+                  textColor: textColor,
                   onTap: () {
                     Navigator.pushNamed(context, '/privacy');
                   },
@@ -145,7 +143,7 @@ class SettingsScreen extends StatelessWidget {
                 SettingsItem(
                   title: "تواصل معنا",
                   icon: Icons.phone,
-                  textColor: textColor, // ✅
+                  textColor: textColor,
                   onTap: () {
                     Navigator.pushNamed(context, '/contact');
                   },
@@ -160,21 +158,53 @@ class SettingsScreen extends StatelessWidget {
               context,
               children: [
 
+                /// ❌ DELETE ACCOUNT
                 SettingsItem(
                   title: "حذف الحساب",
                   icon: Icons.delete,
                   iconColor: Colors.red,
-                  textColor: Colors.red, // ❗ سيبها أحمر
-                  onTap: () {
-                    Helpers.showSnackBar(context, "قريبًا");
+                  textColor: Colors.red,
+                  onTap: () async {
+                    final confirm = await showDialog(
+                      context: context,
+                      builder: (_) => AlertDialog(
+                        title: Text("تأكيد الحذف"),
+                        content: Text("هل أنت متأكد أنك تريد حذف حسابك نهائيًا؟"),
+                        actions: [
+                          TextButton(
+                            child: Text("إلغاء"),
+                            onPressed: () => Navigator.pop(context, false),
+                          ),
+                          TextButton(
+                            child: Text("حذف", style: TextStyle(color: Colors.red)),
+                            onPressed: () => Navigator.pop(context, true),
+                          ),
+                        ],
+                      ),
+                    );
+
+                    if (confirm == true) {
+                      final success = await auth.deleteAccount();
+
+                      if (success) {
+                        Navigator.pushNamedAndRemoveUntil(
+                          context,
+                          '/login',
+                          (route) => false,
+                        );
+                      } else {
+                        Helpers.showSnackBar(context, "فشل حذف الحساب ❌");
+                      }
+                    }
                   },
                 ),
 
+                /// 🚪 LOGOUT
                 SettingsItem(
                   title: "تسجيل الخروج",
                   icon: Icons.logout,
                   iconColor: Colors.red,
-                  textColor: Colors.red, // ❗ سيبها أحمر
+                  textColor: Colors.red,
                   onTap: () async {
                     await auth.logout();
                     Navigator.pushReplacementNamed(context, '/login');
@@ -190,7 +220,6 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  /// 🔥 CARD (Dark Mode Safe)
   Widget _buildCard(BuildContext context,
       {required List<Widget> children}) {
     return Container(

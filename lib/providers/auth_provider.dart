@@ -23,7 +23,6 @@ class AuthProvider with ChangeNotifier {
     if (res != null && res['success'] == true) {
       _user = UserModel.fromJson(res['user']);
 
-      /// ✅ حفظ البيانات
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString("name", _user!.name);
       await prefs.setString("phone", _user!.phone);
@@ -49,7 +48,7 @@ class AuthProvider with ChangeNotifier {
     return success;
   }
 
-  /// 🔄 LOAD USER (🔥 أهم جزء)
+  /// 🔄 LOAD USER
   Future<void> loadUser() async {
     final prefs = await SharedPreferences.getInstance();
 
@@ -75,5 +74,31 @@ class AuthProvider with ChangeNotifier {
 
     _user = null;
     notifyListeners();
+  }
+
+  /// ❌ DELETE ACCOUNT
+  Future<bool> deleteAccount() async {
+    _loading = true;
+    notifyListeners();
+
+    try {
+      final success = await AuthService.deleteAccount();
+
+      _loading = false;
+
+      if (success) {
+        await logout();
+        return true;
+      }
+
+      notifyListeners();
+      return false;
+    } catch (e) {
+      print(e);
+
+      _loading = false;
+      notifyListeners();
+      return false;
+    }
   }
 }
