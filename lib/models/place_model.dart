@@ -6,9 +6,13 @@ class PlaceModel {
   final String whatsapp;
   final String openTime;
   final String closeTime;
-  final String address; // 👈 جديد
+  final String address;
   final int categoryId;
   final String workingDays;
+
+  /// ⭐ الجديد (rating)
+  final double rating;
+  final int ratingCount;
 
   PlaceModel({
     required this.id,
@@ -21,6 +25,10 @@ class PlaceModel {
     required this.address,
     required this.categoryId,
     required this.workingDays,
+
+    /// ⭐ الجديد
+    this.rating = 0,
+    this.ratingCount = 0,
   });
 
   /// 🔥 Fix image + null safety
@@ -41,9 +49,13 @@ class PlaceModel {
       whatsapp: json['whatsapp'] ?? '',
       openTime: json['open_time'] ?? '',
       closeTime: json['close_time'] ?? '',
-      address: json['address'] ?? '', // 👈 مهم
+      address: json['address'] ?? '',
       categoryId: json['category_id'] ?? 0,
       workingDays: json['working_days'] ?? '',
+
+      /// ⭐ الجديد
+      rating: (json['rating'] ?? 0).toDouble(),
+      ratingCount: json['rating_count'] ?? 0,
     );
   }
 }

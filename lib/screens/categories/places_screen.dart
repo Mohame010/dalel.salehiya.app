@@ -16,12 +16,14 @@ class _PlacesScreenState extends State<PlacesScreen> {
   bool loading = true;
   bool _loaded = false;
 
+  late CategoryModel category;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
 
     if (!_loaded) {
-      final category =
+      category =
           ModalRoute.of(context)!.settings.arguments as CategoryModel;
 
       loadPlaces(category.id);
@@ -32,6 +34,8 @@ class _PlacesScreenState extends State<PlacesScreen> {
   Future<void> loadPlaces(int categoryId) async {
     final box = Hive.box('appData');
 
+    setState(() => loading = true);
+
     try {
       print("🔥 CALL API");
 
@@ -41,14 +45,13 @@ class _PlacesScreenState extends State<PlacesScreen> {
           .map((e) => PlaceModel.fromJson(e))
           .toList();
 
-      /// 💾 Save per category
       await box.put('places_$categoryId', res);
 
       print("✅ FROM API");
+
     } catch (e) {
       print("⚠️ API FAILED → LOAD CACHE");
 
-      /// 📦 Load from cache
       final cached = box.get('places_$categoryId') ?? [];
 
       places = (cached as List)
@@ -58,35 +61,50 @@ class _PlacesScreenState extends State<PlacesScreen> {
           .toList();
     }
 
-    /// ✅ دا لازم يكون برا try/catch
-    setState(() {
-      loading = false;
-    });
+    if (!mounted) return;
+
+    setState(() => loading = false);
+  }
+
+  Future<void> _refresh() async {
+    await loadPlaces(category.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final category =
-        ModalRoute.of(context)!.settings.arguments as CategoryModel;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(category.name),
       ),
+
       body: loading
-          ? Center(child: CircularProgressIndicator())
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
           : places.isEmpty
               ? Center(
-                  child: Text(
-                    "لا يوجد أماكن",
-                    style: TextStyle(fontSize: 16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.store_mall_directory_outlined,
+                          size: 60, color: Colors.grey),
+                      SizedBox(height: 10),
+                      Text(
+                        "لا يوجد أماكن",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ],
                   ),
                 )
-              : ListView.builder(
-                  itemCount: places.length,
-                  itemBuilder: (context, index) {
-                    return PlaceCard(place: places[index]);
-                  },
+              : RefreshIndicator(
+                  onRefresh: _refresh,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: places.length,
+                    itemBuilder: (context, index) {
+                      return PlaceCard(place: places[index]);
+                    },
+                  ),
                 ),
     );
   }

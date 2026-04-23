@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../../models/place_model.dart';
 import '../../routes/app_routes.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import '../../services/favorite_service.dart'; // 🔥 جديد
+import '../../services/favorite_service.dart';
 
 class PlaceCard extends StatefulWidget {
   final PlaceModel place;
@@ -21,15 +21,32 @@ class _PlaceCardState extends State<PlaceCard> {
   @override
   void initState() {
     super.initState();
-
-    /// ❤️ حالة المفضلة
     isFav = FavoriteService.isFavorite(widget.place.id);
+  }
+
+  /// ⭐ تحويل rating لنجوم
+  Widget buildStars(double rating) {
+    return Row(
+      children: List.generate(5, (index) {
+        return Icon(
+          index < rating.round()
+              ? Icons.star
+              : Icons.star_border,
+          size: 14,
+          color: Colors.amber,
+        );
+      }),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
 
     final place = widget.place;
+
+    /// ⭐ fallback لو مفيش rating في الموديل
+    final double rating = (place.rating ?? 0).toDouble();
+    final int ratingCount = place.ratingCount ?? 0;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => isPressed = true),
@@ -96,7 +113,7 @@ class _PlaceCardState extends State<PlaceCard> {
                       memCacheHeight: 300,
                     ),
 
-                    /// 🌑 Overlay
+                    /// 🌑 overlay
                     Positioned.fill(
                       child: Container(
                         decoration: BoxDecoration(
@@ -112,7 +129,7 @@ class _PlaceCardState extends State<PlaceCard> {
                       ),
                     ),
 
-                    /// ⭐ Badge
+                    /// ⭐ badge
                     Positioned(
                       top: 10,
                       right: 10,
@@ -133,7 +150,7 @@ class _PlaceCardState extends State<PlaceCard> {
                       ),
                     ),
 
-                    /// ❤️ FAVORITE BUTTON 🔥
+                    /// ❤️ favorite
                     Positioned(
                       top: 10,
                       left: 10,
@@ -172,7 +189,6 @@ class _PlaceCardState extends State<PlaceCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
 
-                    /// 🏷 Name
                     Text(
                       place.name,
                       style: TextStyle(
@@ -183,7 +199,24 @@ class _PlaceCardState extends State<PlaceCard> {
 
                     SizedBox(height: 6),
 
-                    /// 📍 Address
+                    /// ⭐ rating row (NEW)
+                    Row(
+                      children: [
+                        buildStars(rating),
+                        SizedBox(width: 6),
+                        Text(
+                          "($ratingCount)",
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    SizedBox(height: 6),
+
+                    /// 📍 address
                     Row(
                       children: [
                         Icon(Icons.location_on,
@@ -202,7 +235,7 @@ class _PlaceCardState extends State<PlaceCard> {
 
                     SizedBox(height: 6),
 
-                    /// 📞 Phone
+                    /// 📞 phone
                     Row(
                       children: [
                         Icon(Icons.phone,

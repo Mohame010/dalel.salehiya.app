@@ -2,7 +2,7 @@ name: sa3dawy_app
 description: A professional Flutter app (Dashboard + User App)
 publish_to: "none"
 
-version: 1.0.0+3
+version: 1.0.1+5
 
 environment:
   sdk: ">=3.3.0 <4.0.0"
@@ -49,6 +49,7 @@ dependencies:
 
   # 🏷 Rename App
   rename: ^3.1.0
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:
