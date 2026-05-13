@@ -15,6 +15,9 @@ import 'providers/auth_provider.dart';
 import 'providers/home_provider.dart';
 import 'providers/search_provider.dart';
 
+/// 🔥 NEW
+import 'providers/recently_provider.dart';
+
 /// 🔹 Theme
 import 'core/theme/app_theme.dart';
 import 'core/theme/app_theme_provider.dart';
@@ -27,6 +30,7 @@ final GlobalKey<NavigatorState> navigatorKey =
     GlobalKey<NavigatorState>();
 
 void main() async {
+
   WidgetsFlutterBinding.ensureInitialized();
 
   /// 🔥 Firebase Init
@@ -36,77 +40,122 @@ void main() async {
 
   /// 🔥 Hive Init
   await Hive.initFlutter();
+
   await Hive.openBox('appData');
 
   /// 🔥 OneSignal
-  OneSignal.initialize("85026b5a-4e49-4e87-8379-6758fb5d7167");
+  OneSignal.initialize(
+    "85026b5a-4e49-4e87-8379-6758fb5d7167",
+  );
 
-  OneSignal.Notifications.requestPermission(true);
+  OneSignal.Notifications.requestPermission(
+    true,
+  );
 
-  OneSignal.Notifications.addClickListener((event) async {
+  OneSignal.Notifications.addClickListener(
+    (event) async {
 
-    final data = event.notification.additionalData;
+      final data =
+          event.notification.additionalData;
 
-    if (data == null) return;
+      if (data == null) return;
 
-    final openType = data['openType'];
-    final url = data['url'];
+      final openType = data['openType'];
 
-    if (openType == "url" && url != null) {
-      final uri = Uri.parse(url);
+      final url = data['url'];
 
-      await launchUrl(
-        uri,
-        mode: LaunchMode.externalApplication,
-      );
-    } else if (openType == "screen") {
-      navigatorKey.currentState?.pushNamed('/home');
-    }
-  });
+      if (openType == "url" &&
+          url != null) {
+
+        final uri = Uri.parse(url);
+
+        await launchUrl(
+          uri,
+          mode:
+              LaunchMode.externalApplication,
+        );
+
+      } else if (openType == "screen") {
+
+        navigatorKey.currentState
+            ?.pushNamed('/home');
+      }
+    },
+  );
 
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
 
     return MultiProvider(
+
       providers: [
 
-        /// 🔥 Auth
+        /// 🔥 AUTH
         ChangeNotifierProvider(
-          create: (_) => AuthProvider()..loadUser(),
+          create: (_) =>
+              AuthProvider()..loadUser(),
         ),
 
-        ChangeNotifierProvider(create: (_) => HomeProvider()),
+        /// 🔥 HOME
+        ChangeNotifierProvider(
+          create: (_) => HomeProvider(),
+        ),
 
         /// 🔍 SEARCH
-        ChangeNotifierProvider(create: (_) => SearchProvider()),
-
-        /// 🌙 THEME (🔥 أهم تعديل)
         ChangeNotifierProvider(
-          create: (_) => AppThemeProvider()..loadTheme(), // 🔥 FIX
+          create: (_) => SearchProvider(),
+        ),
+
+        /// 🔥 RECENTLY VIEWED
+        ChangeNotifierProvider(
+          create: (_) => RecentlyProvider(),
+        ),
+
+        /// 🌙 THEME
+        ChangeNotifierProvider(
+          create: (_) =>
+              AppThemeProvider()
+                ..loadTheme(),
         ),
       ],
 
       child: Consumer<AppThemeProvider>(
-        builder: (context, themeProvider, _) {
+        builder:
+            (
+              context,
+              themeProvider,
+              _,
+            ) {
 
           return MaterialApp(
+
             navigatorKey: navigatorKey,
-            debugShowCheckedModeBanner: false,
 
-            /// 🎨 Themes
+            debugShowCheckedModeBanner:
+                false,
+
+            /// 🎨 THEMES
             theme: AppTheme.lightTheme,
-            darkTheme: AppTheme.darkTheme,
-            themeMode: themeProvider.themeMode,
 
-            /// 🚦 Routing
-            initialRoute: AppRoutes.splash,
-            onGenerateRoute: AppRoutes.generateRoute,
+            darkTheme:
+                AppTheme.darkTheme,
 
-            /// 🌍 Arabic
+            themeMode:
+                themeProvider.themeMode,
+
+            /// 🚦 ROUTING
+            initialRoute:
+                AppRoutes.splash,
+
+            onGenerateRoute:
+                AppRoutes.generateRoute,
+
+            /// 🌍 ARABIC
             locale: const Locale('ar'),
           );
         },
